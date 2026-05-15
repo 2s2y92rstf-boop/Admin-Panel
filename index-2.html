@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Демо Сайт — Тест логування</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f0f0; color: #222; min-height: 100vh; }
+  header { background: #1a1a2e; color: #fff; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header span { font-size: 12px; color: #888; background: #0f3460; padding: 3px 10px; border-radius: 10px; }
+  .tabs { display: flex; gap: 0; background: #fff; border-bottom: 2px solid #e0e0e0; padding: 0 32px; }
+  .tab { padding: 14px 24px; cursor: pointer; font-size: 14px; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab.active { color: #5a3da6; border-color: #5a3da6; font-weight: 600; }
+  .content { padding: 40px 32px; max-width: 480px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .card { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 20px; margin-bottom: 4px; }
+  .card p { font-size: 13px; color: #888; margin-bottom: 24px; }
+  label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #444; }
+  input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 16px; transition: border-color 0.2s; }
+  input:focus { outline: none; border-color: #5a3da6; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  button[type=submit] { width: 100%; padding: 12px; background: #5a3da6; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  button[type=submit]:hover { background: #4a2d96; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 8px; margin-left: 8px; }
+  .badge-green { background: #e6f7ef; color: #27ae60; }
+  .notice { font-size: 11px; color: #aaa; text-align: center; margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛍️ MyShop</h1>
+  <span>Демо для тесту логування</span>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('login')">Вхід</div>
+  <div class="tab" onclick="showTab('register')">Реєстрація</div>
+  <div class="tab" onclick="showTab('payment')">Оплата</div>
+</div>
+
+<div class="content">
+  <!-- LOGIN -->
+  <div class="panel active" id="panel-login">
+    <div class="card">
+      <h2>Вхід до акаунту</h2>
+      <p>Введіть свої дані для входу</p>
+      <form id="login-form" action="#" onsubmit="handleSubmit(event, 'login')">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="user@example.com" required />
+        <label>Пароль</label>
+        <input type="password" name="password" placeholder="••••••••" required />
+        <button type="submit">Увійти</button>
+      </form>
+      <p class="notice">Всі дії логуються в адмін панель</p>
+    </div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="panel" id="panel-register">
+    <div class="card">
+      <h2>Реєстрація</h2>
+      <p>Створіть новий акаунт</p>
+      <form id="register-form" action="#" onsubmit="handleSubmit(event, 'register')">
+        <div class="row">
+          <div>
+            <label>Ім'я</label>
+            <input type="text" name="first_name" placeholder="Іван" required />
+          </div>
+          <div>
+            <label>Прізвище</label>
+            <input type="text" name="last_name" placeholder="Петренко" required />
+          </div>
+        </div>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="user@example.com" required />
+        <label>Телефон</label>
+        <input type="tel" name="phone" placeholder="+380XXXXXXXXX" />
+        <label>Пароль</label>
+        <input type="password" name="password" placeholder="Мінімум 8 символів" required minlength="8" />
+        <label>Підтвердити пароль</label>
+        <input type="password" name="password_confirm" placeholder="Повторіть пароль" required />
+        <button type="submit">Зареєструватися</button>
+      </form>
+      <p class="notice">Паролі маскуються автоматично</p>
+    </div>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="panel" id="panel-payment">
+    <div class="card">
+      <h2>Оплата <span class="badge badge-green">🔒 Захищено</span></h2>
+      <p>Введіть дані картки для оплати</p>
+      <form id="payment-form" action="#" onsubmit="handleSubmit(event, 'payment')">
+        <label>Ім'я на картці</label>
+        <input type="text" name="cardholder" placeholder="IVAN PETRENKO" required />
+        <label>Номер картки</label>
+        <input type="text" name="card_number" placeholder="0000 0000 0000 0000" maxlength="19"
+          oninput="this.value=this.value.replace(/\D/g,'').replace(/(\d{4})/g,'$1 ').trim()" required />
+        <div class="row">
+          <div>
+            <label>Термін дії</label>
+            <input type="text" name="expiry" placeholder="MM/YY" maxlength="5"
+              oninput="this.value=this.value.replace(/\D/g,'').replace(/(\d{2})(\d)/,'$1/$2')" required />
+          </div>
+          <div>
+            <label>CVV</label>
+            <input type="password" name="cvv" placeholder="•••" maxlength="3" required />
+          </div>
+        </div>
+        <label>Сума (UAH)</label>
+        <input type="number" name="amount" placeholder="0.00" min="1" required />
+        <button type="submit">💳 Оплатити</button>
+      </form>
+      <p class="notice">Номер картки та CVV маскуються перед відправкою</p>
+    </div>
+  </div>
+</div>
+
+<!-- Підключаємо трекер — замініть URL на свій сервер -->
+<script src="/tracker.js" data-server="http://localhost:3000"></script>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['login','register','payment'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + name);
+  });
+}
+
+function handleSubmit(e, type) {
+  e.preventDefault();
+  // Тут ваша логіка (ajax запит, тощо)
+  alert('Форма [' + type + '] відправлена! Перевірте логи в адмінці.');
+}
+</script>
+</body>
+</html>

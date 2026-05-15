@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f0f13; --surface: #13121a; --surface2: #16141f;
+  --border: #2a2840; --border2: #1e1c2a;
+  --text: #e0dff5; --muted: #8880a8; --hint: #4a4868;
+  --purple: #7c5cbf; --purple-light: #c8b8ff; --purple-bg: rgba(124,92,191,0.2);
+  --green: #3ecf8e; --yellow: #f5c842; --red: #f57070; --blue: #7c9ef5;
+  --info-bg: rgba(124,158,245,0.1); --warn-bg: rgba(245,200,66,0.1); --err-bg: rgba(245,112,112,0.1);
+}
+body { font-family: 'Courier New', monospace; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+
+/* Sidebar */
+aside { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.logo { padding: 18px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+.logo-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--purple); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.logo-text { font-size: 13px; font-weight: 700; color: var(--purple-light); letter-spacing: 0.08em; }
+nav { flex: 1; padding: 10px 6px; }
+.nav-item { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; border: none; cursor: pointer; background: transparent; color: var(--muted); margin-bottom: 3px; font-family: inherit; text-align: left; transition: all 0.15s; position: relative; }
+.nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.nav-item.active { background: var(--purple-bg); color: var(--purple-light); }
+.nav-item i { font-size: 17px; flex-shrink: 0; }
+.nav-label { font-size: 12px; font-weight: 600; }
+.nav-sub { font-size: 10px; color: var(--hint); }
+.badge-count { position: absolute; right: 8px; top: 8px; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 5px; min-width: 16px; text-align: center; }
+.sidebar-footer { padding: 12px 14px; border-top: 1px solid var(--border); font-size: 11px; color: var(--hint); }
+
+/* Main */
+main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+header { height: 52px; padding: 0 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: #11101a; flex-shrink: 0; }
+.header-title { font-size: 14px; font-weight: 700; color: #d0c8f8; }
+.header-sub { font-size: 11px; color: var(--hint); margin-left: 8px; }
+.ws-status { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+.ws-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hint); transition: all 0.3s; }
+.ws-dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.ws-dot.error { background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+/* Stats bar */
+.stats-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: #11101a; padding: 0 22px; flex-shrink: 0; }
+.stat { padding: 10px 20px 10px 0; margin-right: 20px; border-right: 1px solid var(--border2); }
+.stat:last-child { border-right: none; }
+.stat-val { font-size: 18px; font-weight: 700; color: var(--text); }
+.stat-label { font-size: 10px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Content area */
+.content { flex: 1; overflow-y: auto; padding: 0; }
+
+/* Panels */
+.panel { display: none; height: 100%; }
+.panel.active { display: flex; flex-direction: column; }
+
+/* LOGS panel */
+.log-toolbar { padding: 12px 22px; display: flex; gap: 8px; align-items: center; border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
+.filter-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--hint); font-size: 11px; cursor: pointer; font-family: inherit; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.15s; }
+.filter-btn.active { border-color: var(--purple); background: var(--purple-bg); color: var(--purple-light); }
+.filter-btn.info.active { border-color: var(--blue); background: var(--info-bg); color: var(--blue); }
+.filter-btn.warn.active { border-color: var(--yellow); background: var(--warn-bg); color: var(--yellow); }
+.filter-btn.error.active { border-color: var(--red); background: var(--err-bg); color: var(--red); }
+.toolbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.clear-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--hint); font-size: 11px; cursor: pointer; font-family: inherit; }
+.clear-btn:hover { border-color: var(--red); color: var(--red); }
+.live-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--green); color: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+.logs-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+.log-entry { display: grid; grid-template-columns: 70px 55px 75px 90px 1fr; gap: 10px; padding: 7px 22px; align-items: start; border-bottom: 1px solid var(--border2); font-size: 11px; transition: background 0.1s; animation: fadeIn 0.3s ease; }
+.log-entry:hover { background: rgba(255,255,255,0.025); }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+.log-time { color: var(--hint); font-family: monospace; }
+.log-level { padding: 1px 6px; border-radius: 4px; text-align: center; font-size: 10px; font-weight: 600; }
+.log-level.info { color: var(--blue); background: var(--info-bg); }
+.log-level.warn { color: var(--yellow); background: var(--warn-bg); }
+.log-level.error { color: var(--red); background: var(--err-bg); }
+.log-form { padding: 1px 6px; border-radius: 4px; background: #18162a; color: var(--muted); font-size: 10px; }
+.log-ip { color: var(--hint); font-family: monospace; font-size: 10px; }
+.log-msg { color: #c0b8e8; }
+.log-fields { margin-top: 4px; font-size: 10px; color: var(--hint); font-family: monospace; }
+.log-field-item { display: inline-block; background: #0e0d16; border-radius: 3px; padding: 1px 6px; margin: 2px 3px 2px 0; }
+.log-field-key { color: var(--purple-light); }
+.log-field-val { color: var(--muted); }
+
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--hint); gap: 12px; }
+.empty-state i { font-size: 40px; opacity: 0.3; }
+.empty-state p { font-size: 13px; }
+
+/* SESSIONS panel */
+.sessions-grid { padding: 18px 22px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+.session-card { background: var(--surface2); border-radius: 10px; padding: 14px; }
+.session-card.current { border: 1px solid var(--purple); }
+.session-card:not(.current) { border: 1px solid var(--border); }
+.session-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.session-ip { font-size: 14px; font-weight: 700; color: #c0b8f0; }
+.session-tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: var(--purple-bg); color: var(--purple-light); border: 1px solid var(--purple); }
+.revoke-btn { padding: 4px 10px; border-radius: 6px; border: 1px solid #6a2828; background: rgba(245,112,112,0.08); color: var(--red); font-size: 11px; cursor: pointer; font-family: inherit; }
+.session-meta { font-size: 11px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.session-fp { font-size: 10px; color: var(--hint); background: #0e0d16; border-radius: 5px; padding: 5px 8px; font-family: monospace; word-break: break-all; }
+
+/* STATUS panel */
+.status-grid { padding: 18px 22px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; overflow-y: auto; }
+.service-card { background: var(--surface2); border-radius: 10px; padding: 14px; }
+.service-card.online { border: 1px solid #1e3a2a; }
+.service-card.offline { border: 1px solid #3a1e1e; }
+.service-card.degraded { border: 1px solid #3a2e1e; }
+.service-head { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.service-name { font-size: 13px; font-weight: 700; color: #c0b8f0; }
+.service-status { display: flex; align-items: center; gap: 5px; font-size: 10px; text-transform: uppercase; }
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+.service-url { font-size: 10px; color: var(--hint); font-family: monospace; margin-bottom: 10px; }
+.service-metrics { display: flex; gap: 14px; }
+.metric-val { font-size: 15px; font-weight: 700; }
+.metric-label { font-size: 9px; color: var(--hint); text-transform: uppercase; margin-bottom: 2px; }
+
+/* NOTIFS panel */
+.notifs-list { padding: 16px 22px; overflow-y: auto; }
+.notif-toolbar { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: center; }
+.notif-count { font-size: 12px; color: var(--hint); }
+.mark-read-btn { font-size: 11px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-family: inherit; }
+.notif-item { background: var(--surface2); border-radius: 9px; padding: 11px 14px; margin-bottom: 8px; cursor: pointer; transition: opacity 0.2s; }
+.notif-item.unread { border: 1px solid rgba(124,158,245,0.3); }
+.notif-item.read { border: 1px solid var(--border2); opacity: 0.55; }
+.notif-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.notif-title { font-size: 12px; font-weight: 700; }
+.notif-time { font-size: 10px; color: var(--hint); }
+.notif-body { font-size: 11px; color: #7070a0; }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-shield-lock" style="font-size:15px;color:#e0d8ff"></i></div>
+    <span class="logo-text">ADMIN PANEL</span>
+  </div>
+  <nav>
+    <button class="nav-item active" onclick="showPanel('logs')">
+      <i class="ti ti-terminal-2"></i>
+      <div><div class="nav-label">Логи</div><div class="nav-sub">Live events</div></div>
+      <span class="badge-count" id="new-badge" style="display:none">0</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('sessions')">
+      <i class="ti ti-users"></i>
+      <div><div class="nav-label">Сесії</div><div class="nav-sub">Хто залогінений</div></div>
+    </button>
+    <button class="nav-item" onclick="showPanel('status')">
+      <i class="ti ti-heartbeat"></i>
+      <div><div class="nav-label">Статуси</div><div class="nav-sub">Health-check</div></div>
+    </button>
+    <button class="nav-item" onclick="showPanel('notifications')">
+      <i class="ti ti-bell"></i>
+      <div><div class="nav-label">Сповіщення</div><div class="nav-sub">Оповіщення</div></div>
+    </button>
+  </nav>
+  <div class="sidebar-footer">Сало otgail!</div>
+</aside>
+
+<main>
+  <header>
+    <div>
+      <span class="header-title" id="page-title">Логи</span>
+      <span class="header-sub" id="page-sub">Live events</span>
+    </div>
+    <div class="ws-status">
+      <div class="ws-dot" id="ws-dot"></div>
+      <span id="ws-label">Підключення...</span>
+      <button onclick="location.reload()" style="margin-left:8px;padding:3px 10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:11px;">
+        <i class="ti ti-refresh"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-label">Всього</div></div>
+    <div class="stat"><div class="stat-val" id="stat-logins">0</div><div class="stat-label">Логіни</div></div>
+    <div class="stat"><div class="stat-val" id="stat-registers">0</div><div class="stat-label">Реєстрації</div></div>
+    <div class="stat"><div class="stat-val" id="stat-payments">0</div><div class="stat-label">Оплати</div></div>
+    <div class="stat"><div class="stat-val" id="stat-errors" style="color:var(--red)">0</div><div class="stat-label">Помилки</div></div>
+  </div>
+
+  <div class="content">
+
+    <!-- LOGS -->
+    <div class="panel active" id="panel-logs">
+      <div class="log-toolbar">
+        <button class="filter-btn active" onclick="setFilter('all',this)">Всі</button>
+        <button class="filter-btn info" onclick="setFilter('info',this)">Info</button>
+        <button class="filter-btn warn" onclick="setFilter('warn',this)">Warn</button>
+        <button class="filter-btn error" onclick="setFilter('error',this)">Error</button>
+        <button class="filter-btn" onclick="setFilter('login',this)">Логін</button>
+        <button class="filter-btn" onclick="setFilter('register',this)">Реєстрація</button>
+        <button class="filter-btn" onclick="setFilter('payment',this)">Оплата</button>
+        <div class="toolbar-right">
+          <span class="live-badge" id="live-badge">● LIVE</span>
+          <button class="clear-btn" onclick="clearLogs()"><i class="ti ti-trash"></i> Очистити</button>
+        </div>
+      </div>
+      <div class="logs-list" id="logs-list">
+        <div class="empty-state" id="empty-state">
+          <i class="ti ti-satellite"></i>
+          <p>Очікуємо підключення та події...</p>
+          <p style="font-size:11px;opacity:0.5">Відправте форму на сайті, щоб побачити логи</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SESSIONS -->
+    <div class="panel" id="panel-sessions">
+      <div class="sessions-grid" id="sessions-list">
+        <div class="session-card current">
+          <div class="session-head">
+            <span class="session-ip">172.70.246.192</span>
+            <span class="session-tag">Поточна</span>
+          </div>
+          <div class="session-meta">
+            <span><i class="ti ti-device-desktop" style="margin-right:3px"></i>Edge / macOS / Desktop</span>
+            <span><i class="ti ti-calendar" style="margin-right:3px"></i>5 кві 2026, 19:28:26</span>
+            <span><i class="ti ti-clock" style="margin-right:3px"></i>Активна: 5 кві 2026, 20:51:31</span>
+          </div>
+          <div class="session-fp">Fingerprint: TW96aWxhLzUuMCBNYWNpbnRvc2g7IEludGVsIG1hYyBPUyBYIDE1XzFfMCkgQXBwbGVXZWJLaXQvNTM3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="panel" id="panel-status">
+      <div class="status-grid">
+        <div class="service-card online">
+          <div class="service-head"><span class="service-name">API Gateway</span><div class="service-status"><div class="dot" style="background:#3ecf8e;box-shadow:0 0 5px #3ecf8e"></div><span style="color:#3ecf8e">online</span></div></div>
+          <div class="service-url">api.example.com</div>
+          <div class="service-metrics"><div><div class="metric-label">Latency</div><div class="metric-val" style="color:#3ecf8e">42ms</div></div><div><div class="metric-label">Uptime</div><div class="metric-val">99.9%</div></div></div>
+        </div>
+        <div class="service-card online">
+          <div class="service-head"><span class="service-name">База даних</span><div class="service-status"><div class="dot" style="background:#3ecf8e;box-shadow:0 0 5px #3ecf8e"></div><span style="color:#3ecf8e">online</span></div></div>
+          <div class="service-url">db.internal:5432</div>
+          <div class="service-metrics"><div><div class="metric-label">Latency</div><div class="metric-val" style="color:#3ecf8e">8ms</div></div><div><div class="metric-label">Uptime</div><div class="metric-val">100%</div></div></div>
+        </div>
+        <div class="service-card offline">
+          <div class="service-head"><span class="service-name">Mail Service</span><div class="service-status"><div class="dot" style="background:#f57070;box-shadow:0 0 5px #f57070"></div><span style="color:#f57070">offline</span></div></div>
+          <div class="service-url">smtp.example.com</div>
+          <div class="service-metrics"><div><div class="metric-label">Latency</div><div class="metric-val" style="color:#f57070">—</div></div><div><div class="metric-label">Uptime</div><div class="metric-val">94.2%</div></div></div>
+        </div>
+        <div class="service-card degraded">
+          <div class="service-head"><span class="service-name">Worker Queue</span><div class="service-status"><div class="dot" style="background:#f5c842;box-shadow:0 0 5px #f5c842"></div><span style="color:#f5c842">degraded</span></div></div>
+          <div class="service-url">worker.internal</div>
+          <div class="service-metrics"><div><div class="metric-label">Latency</div><div class="metric-val" style="color:#f5c842">230ms</div></div><div><div class="metric-label">Uptime</div><div class="metric-val">98.1%</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="panel" id="panel-notifications">
+      <div class="notifs-list">
+        <div class="notif-toolbar">
+          <span class="notif-count" id="unread-count">2 непрочитаних</span>
+          <button class="mark-read-btn" onclick="markAllRead()">Всі прочитані</button>
+        </div>
+        <div id="notifs-container">
+          <div class="notif-item unread" onclick="this.classList.replace('unread','read');updateUnread()">
+            <div class="notif-head"><span class="notif-title" style="color:#f57070">Сервіс Mail впав</span><span class="notif-time">21:05</span></div>
+            <div class="notif-body">SMTP недоступний вже 14 хв.</div>
+          </div>
+          <div class="notif-item unread" onclick="this.classList.replace('unread','read');updateUnread()">
+            <div class="notif-head"><span class="notif-title" style="color:#f5c842">Диск майже повний</span><span class="notif-time">20:10</span></div>
+            <div class="notif-body">Залишилося &lt; 13% місця на /var.</div>
+          </div>
+          <div class="notif-item read">
+            <div class="notif-head"><span class="notif-title">Деплой v2.4.1</span><span class="notif-time">19:58</span></div>
+            <div class="notif-body">Нова версія задеплоєна успішно.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+const WS_URL = "ws://localhost:3000/ws";  // ← замініть на свій сервер
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let allLogs = [];
+let currentFilter = "all";
+let currentPanel = "logs";
+let stats = { total: 0, logins: 0, registers: 0, payments: 0, errors: 0 };
+let newLogCount = 0;
+let ws = null;
+
+// ── WEBSOCKET ──────────────────────────────────────────────────────────────
+function connectWS() {
+  ws = new WebSocket(WS_URL);
+
+  ws.onopen = () => {
+    setWsStatus("connected", "WebSocket підключено");
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "init") {
+        allLogs = msg.logs;
+        recalcStats();
+        renderLogs();
+      } else if (msg.type === "new_log") {
+        allLogs.unshift(msg.log);
+        updateStats(msg.log);
+        prependLogEntry(msg.log);
+        // Show badge if not on logs panel
+        if (currentPanel !== "logs") {
+          newLogCount++;
+          const badge = document.getElementById("new-badge");
+          badge.style.display = "block";
+          badge.textContent = newLogCount;
+        }
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  ws.onclose = () => {
+    setWsStatus("", "Відключено — реконект...");
+    setTimeout(connectWS, 3000);
+  };
+
+  ws.onerror = () => {
+    setWsStatus("error", "Помилка WebSocket");
+  };
+}
+
+function setWsStatus(cls, text) {
+  const dot = document.getElementById("ws-dot");
+  dot.className = "ws-dot " + cls;
+  document.getElementById("ws-label").textContent = text;
+  const badge = document.getElementById("live-badge");
+  badge.style.opacity = cls === "connected" ? "1" : "0.3";
+}
+
+// ── STATS ──────────────────────────────────────────────────────────────────
+function recalcStats() {
+  stats = {
+    total: allLogs.length,
+    logins: allLogs.filter(l => l.form === "login").length,
+    registers: allLogs.filter(l => l.form === "register").length,
+    payments: allLogs.filter(l => l.form === "payment").length,
+    errors: allLogs.filter(l => l.level === "error").length,
+  };
+  renderStats();
+}
+
+function updateStats(log) {
+  stats.total++;
+  if (log.form === "login") stats.logins++;
+  if (log.form === "register") stats.registers++;
+  if (log.form === "payment") stats.payments++;
+  if (log.level === "error") stats.errors++;
+  renderStats();
+}
+
+function renderStats() {
+  document.getElementById("stat-total").textContent = stats.total;
+  document.getElementById("stat-logins").textContent = stats.logins;
+  document.getElementById("stat-registers").textContent = stats.registers;
+  document.getElementById("stat-payments").textContent = stats.payments;
+  document.getElementById("stat-errors").textContent = stats.errors;
+}
+
+// ── LOGS RENDERING ─────────────────────────────────────────────────────────
+function matchesFilter(log) {
+  if (currentFilter === "all") return true;
+  if (["info","warn","error"].includes(currentFilter)) return log.level === currentFilter;
+  return log.form === currentFilter;
+}
+
+function renderLogs() {
+  const list = document.getElementById("logs-list");
+  const filtered = allLogs.filter(matchesFilter);
+  document.getElementById("empty-state").style.display = filtered.length ? "none" : "flex";
+  const existing = list.querySelectorAll(".log-entry");
+  existing.forEach(e => e.remove());
+  filtered.slice(0, 200).forEach(log => {
+    list.appendChild(buildLogEntry(log));
+  });
+}
+
+function prependLogEntry(log) {
+  if (!matchesFilter(log)) return;
+  const list = document.getElementById("logs-list");
+  document.getElementById("empty-state").style.display = "none";
+  list.insertBefore(buildLogEntry(log), list.querySelector(".log-entry"));
+}
+
+function buildLogEntry(log) {
+  const el = document.createElement("div");
+  el.className = "log-entry";
+  // Fields display
+  let fieldsHtml = "";
+  if (log.fields && Object.keys(log.fields).length > 0) {
+    fieldsHtml = '<div class="log-fields">' +
+      Object.entries(log.fields).map(([k, v]) =>
+        `<span class="log-field-item"><span class="log-field-key">${k}</span>=<span class="log-field-val">${v}</span></span>`
+      ).join("") + "</div>";
+  }
+  el.innerHTML = `
+    <span class="log-time">${log.time || "--:--:--"}</span>
+    <span class="log-level ${log.level || "info"}">${log.level || "info"}</span>
+    <span class="log-form">${log.form || "—"}</span>
+    <span class="log-ip">${(log.ip || "").substring(0, 15)}</span>
+    <div>
+      <div class="log-msg">${escHtml(log.msg || "")}</div>
+      ${fieldsHtml}
+    </div>
+  `;
+  return el;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ── CONTROLS ───────────────────────────────────────────────────────────────
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderLogs();
+}
+
+function clearLogs() {
+  if (!confirm("Очистити всі логи?")) return;
+  allLogs = [];
+  stats = { total: 0, logins: 0, registers: 0, payments: 0, errors: 0 };
+  renderStats();
+  renderLogs();
+}
+
+function showPanel(name) {
+  currentPanel = name;
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-" + name).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+
+  if (name === "logs") {
+    newLogCount = 0;
+    document.getElementById("new-badge").style.display = "none";
+  }
+
+  const titles = { logs: ["Логи","Live events"], sessions: ["Сесії","Хто залогінений"], status: ["Статуси","Health-check"], notifications: ["Сповіщення","Оповіщення"] };
+  const t = titles[name] || ["—","—"];
+  document.getElementById("page-title").textContent = t[0];
+  document.getElementById("page-sub").textContent = t[1];
+}
+
+function markAllRead() {
+  document.querySelectorAll(".notif-item.unread").forEach(n => n.classList.replace("unread","read"));
+  updateUnread();
+}
+
+function updateUnread() {
+  const count = document.querySelectorAll(".notif-item.unread").length;
+  document.getElementById("unread-count").textContent = count + " непрочитаних";
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+connectWS();
+</script>
+</body>
+</html>
